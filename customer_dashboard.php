@@ -52,7 +52,7 @@ include('connect.php');
 		</div>
 	</section>
 
-    <section id="orders">
+	<section id="orders">
 	<div class="container">
 		<h2>Recent Orders</h2>
 		<table>
@@ -67,21 +67,28 @@ include('connect.php');
 				<?php
 				include('connect.php');
 
-				// Query the database for the order data
-				$sql = "SELECT * FROM orders";
-				$result = $conn->query($sql);
+				// Check if user is logged in and retrieve their ID from session
+				if (isset($_SESSION["user_id"])) {
+				    $user_id = $_SESSION["user_id"];
 
-				// Loop through the results and display them in the table
-				if ($result->num_rows > 0) {
-					while($row = $result->fetch_assoc()) {
-						echo "<tr>";
-						echo "<td>" . $row["order_number"] . "</td>";
-						echo "<td>" . $row["order_date"] . "</td>";
-						echo "<td>" . $row["order_status"] . "</td>";
-						echo "</tr>";
-					}
+				    // Query the database for the order data for the logged-in user
+				    $sql = "SELECT * FROM orders WHERE user_id = '$user_id'";
+				    $result = $conn->query($sql);
+
+				    // Loop through the results and display them in the table
+				    if ($result->num_rows > 0) {
+				        while($row = $result->fetch_assoc()) {
+				            echo "<tr>";
+				            echo "<td>" . $row["order_number"] . "</td>";
+				            echo "<td>" . $row["order_date"] . "</td>";
+				            echo "<td>" . $row["order_status"] . "</td>";
+				            echo "</tr>";
+				        }
+				    } else {
+				        echo "<tr><td colspan='3'>No orders found</td></tr>";
+				    }
 				} else {
-					echo "<tr><td colspan='3'>No orders found</td></tr>";
+				    echo "<tr><td colspan='3'>Please log in to view your orders</td></tr>";
 				}
 
 				// Close the database connection
@@ -91,6 +98,7 @@ include('connect.php');
 		</table>
 	</div>
 </section>
+
 
 
 	<section id="fulfillment">
@@ -120,6 +128,4 @@ include('connect.php');
 
 </body>
 </html>
-<?php
-mysqli_close($conn);
-?>
+
